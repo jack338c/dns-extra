@@ -152,6 +152,10 @@ start() {
 			sed -n 's+/dns-.*++g; s+$+/114.114.115.115+g; s+.*server_https.*//+server=/+p' /etc/config/smartdns >>${TARGET}/misc_custom.conf
 			sed -n 's+/dns-.*++g; s+$+/180.76.76.76+g; s+.*server_https.*//+server=/+p' /etc/config/smartdns >>${TARGET}/misc_custom.conf
 			sed -n 's+/dns-.*++g; s+$+/223.6.6.6+g; s+.*server_https.*//+server=/+p' /etc/config/smartdns >>${TARGET}/misc_custom.conf
+			echo 'server=/alidns.com/114.114.115.115' >>${TARGET}/misc_custom.conf
+			echo 'server=/alidns.com/180.76.76.76' >>${TARGET}/misc_custom.conf
+			echo 'server=/dns.pub/114.114.115.115' >>${TARGET}/misc_custom.conf
+			echo 'server=/dns.pub/180.76.76.76' >>${TARGET}/misc_custom.conf
 		}
 
 			echo -n ", OVERWRITE-RESOLVE" && echo 'no-resolv' >>${TARGET}/misc_custom.conf
@@ -214,7 +218,7 @@ update_others() {
 update_sub() {
 	sub=$1
 	file="/etc/${NAME}.d/${sub}"
-	src="https://raw.githubusercontent.com/jack338c/openwrt-${NAME}/master/${NAME}/files/data/${sub}"
+	src="https://raw.githubusercontent.com/jack338c/openwrt-${NAME}/main/${NAME}/files/data/${sub}"
 
 	oldHash=$(md5sum ${file} 2>/dev/null | sed 's/ .*//g')
 	newHash=$(curl --retry 3 --connect-timeout 5 --max-time 20 -ksSL "${src}.md5sum?${ts}" | sed 's/ .*//g')
