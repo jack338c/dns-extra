@@ -42,6 +42,7 @@ start_service() {
 	cat <<-EOF >"/var/etc/${NAME}.conf"
 		bind 0.0.0.0:${port}
 		bind-tcp 0.0.0.0:${port}
+		# tcp-idle-time 0
 		cache-size 768
 		cache-persist no
 
@@ -62,9 +63,9 @@ start_service() {
 
 		$(
 			for it in $(uci_get_by_type $NAME bootstrap); do
-				# echo "server ${it} -group bootstrap -exclude-default-group"
+				echo "server ${it} -group bootstrap -exclude-default-group"
 				echo "server-tcp ${it} -group bootstrap -exclude-default-group"
-				echo "server-tls ${it} -group bootstrap -exclude-default-group"
+				# echo "server-tls ${it} -group bootstrap -exclude-default-group"
 			done
 		)
 
@@ -95,14 +96,14 @@ start_service() {
 		cat <<-EOF >"/var/etc/${NAME}_cn.conf"
 			bind 0.0.0.0:$((port + 1))
 			bind-tcp 0.0.0.0:$((port + 1))
-			cache-size 384
+			# tcp-idle-time 0
+			cache-size 1024
 			cache-persist no
 
 			speed-check-mode ping,tcp:80
 
-			# prefetch-domain $(uci_bool_by_type $NAME prefetch && echo yes || echo no)
+			prefetch-domain $(uci_bool_by_type $NAME prefetch && echo yes || echo no)
 			force-AAAA-SOA $(uci_bool_by_type $NAME ipv6 && echo no || echo yes)
-			prefetch-domain no
 			serve-expired yes
 
 			log-level info

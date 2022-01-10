@@ -41,15 +41,15 @@ start() {
 
 	# plugins
 	for plugin in $(uci_get_by_type ${NAME} general plugins); do
-		[ -x /usr/bin/${plugin} ] && {
+		[ -x /usr/bin/${plugin} ] || [ "V${plugin}" = "Vss-tunnel" -a -x /usr/bin/sslocal ] && {
 			if echo ${plugin} | grep -q 'tunnel'; then
 				plugin_alias=$(echo -n ${plugin} | sed 's/ss/shadowsocks/g; s/-tunnel//g')
 				plugin_srv=$(uci_get_by_type ${plugin_alias} port_forward server nil)
-				[ "V${plugin_srv}" == "Vnil" ] && continue
+				[ "V${plugin_srv}" = "Vnil" ] && continue
 				plugin_port=$(uci_get_by_type ${plugin_alias} port_forward local_port 5300)
 			else
 				plugin_port=$(uci_get_by_type ${plugin} ${plugin} port 0000)
-				[ "V${port_forward}" == "V0000" ] && continue
+				[ "V${port_forward}" = "V0000" ] && continue
 			fi
 			echo -n "plugin:${plugin}, " | tr [a-z] [A-Z]
 			auto_cat 'gfwlist' 'tldn' | sed "s/^/server=\//;s/$/\/127.0.0.1#${plugin_port}/" >${TARGET}/plugin_${plugin}.conf
@@ -59,17 +59,17 @@ start() {
 
 	# pluginsOtcp
 	for plugin in $(uci_get_by_type ${NAME} general pluginsOtcp); do
-		[ -x /usr/bin/${plugin} ] && {
+		[ -x /usr/bin/${plugin} ] || [ "V${plugin}" = "Vss-tunnel" -a -x /usr/bin/sslocal ] && {
 			if echo ${plugin} | grep -qe 'ray\|tunnel'; then
 				plugin_alias=$(echo -n ${plugin} | sed 's/ss/shadowsocks/g; s/-tunnel//g')
 				plugin_srv=$(uci_get_by_type ${plugin_alias} port_forward server nil)
 				plugin_enable=$(uci_get_by_type ${plugin_alias} port_forward 'enable' 0)
-				[ "V${plugin_srv}" == "Vnil" -a "V${plugin_enable}" == "V0" ] && continue
+				[ "V${plugin_srv}" = "Vnil" -a "V${plugin_enable}" = "V0" ] && continue
 				plugin_port=$(uci_get_by_type ${plugin_alias} port_forward local_port 5300)
 
 			else
 				plugin_port=$(uci_get_by_type ${plugin} ${plugin} port 0000)
-				[ "V${port_forward}" == "V0000" ] && continue
+				[ "V${port_forward}" = "V0000" ] && continue
 			fi
 
 			plugin_tcpport=$((plugin_port + 1))
