@@ -82,9 +82,8 @@ define Package/dnsmasq-extra/install
 	$(INSTALL_BIN) ./files/uci-defaults $(1)/etc/uci-defaults/dnsmasq-extra
 	$(INSTALL_DIR) $(1)/etc/dnsmasq-extra.d
 #	$(INSTALL_DATA) ./files/data/*.gz $(1)/etc/dnsmasq-extra.d/
-	$(INSTALL_DATA) ./files/data/*.txt $(1)/etc/dnsmasq-extra.d/
-	$(INSTALL_DATA) ./files/data/*.conf $(1)/etc/dnsmasq-extra.d/
-
+	$(INSTALL_DATA) ./files/data/{gfwlist,ShadowrocketEx.conf,tldn,direct,adblock,custom.conf,bogus.conf,chnroute.txt} $(1)/etc/dnsmasq-extra.d/
+#	$(INSTALL_DATA) ./files/data/{chnroute.txt,custom.conf,bogus.conf} $(1)/etc/dnsmasq-extra.d/
 ifeq ($(CONFIG_DNSMASQ_EXTRA_FORCE_AIODNS),y)
 	sed 's+\(overwrite_resolve.*\)[0-9]+\1enabled+g' -i $(1)/etc/config/dnsmasq-extra
 	sed 's+\(overwrite_aiodns.*\)[0-9]+\1enabled+g' -i $(1)/etc/config/dnsmasq-extra
