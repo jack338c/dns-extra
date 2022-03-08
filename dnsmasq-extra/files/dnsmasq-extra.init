@@ -269,6 +269,7 @@ update() {
 	update_sub 'gfwlist'
 	update_sub 'direct'
 	update_sub 'custom.conf'
+	update_sub 'ShadowrocketEx.conf'
 	update_others
 }
 
