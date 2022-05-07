@@ -56,6 +56,7 @@ start_service() {
 
 		prefetch-domain $(uci_bool_by_type $NAME prefetch && echo yes || echo no)
 		force-AAAA-SOA $(uci_bool_by_type $NAME ipv6 && echo no || echo yes)
+		dualstack-ip-selection $(uci_bool_by_type $NAME ipv6 && echo yes || echo no)
 
 		log-level info
 		log-file /var/log/smartdns.log
@@ -107,6 +108,7 @@ start_service() {
 
 			prefetch-domain $(uci_bool_by_type $NAME prefetch && echo yes || echo no)
 			force-AAAA-SOA $(uci_bool_by_type $NAME ipv6 && echo no || echo yes)
+			dualstack-ip-selection $(uci_bool_by_type $NAME ipv6 && echo yes || echo no)
 			serve-expired yes
 
 			log-level info
