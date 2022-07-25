@@ -52,7 +52,7 @@ start_service() {
 	cat <<-EOF >"/var/etc/${NAME}.conf"
 		bind 0.0.0.0:${port}
 		bind-tcp 0.0.0.0:${port}
-		user $user
+		# user $user
 		cache-size 1024
 		cache-persist no
 		serve-expired yes
@@ -109,7 +109,7 @@ start_service() {
 		cat <<-EOF >"/var/etc/${NAME}_cn.conf"
 			bind 0.0.0.0:$((port + 1))
 			bind-tcp 0.0.0.0:$((port + 1))
-			user $user
+			# user $user
 			cache-size 2048
 			cache-persist no
 			serve-expired yes
