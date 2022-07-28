@@ -84,16 +84,26 @@ start_service() {
 		$(
 			for type in tls https; do
 				for it in $(uci_get_by_type $NAME server_${type}); do
-					it=$(echo ${it} | sed 's+.*//++g; s+/.*++g' | sed 's+@.*++g')
+					it=$(echo ${it} | sed 's+.*//++g; s+/.*++g' | sed 's+@.*++g; s+:.*++g')
 					echo ${it} | grep -q '[0-9]$' || echo "nameserver /${it}/bootstrap"
 				done
-			done
+			done | sort -u
 		)
 
 		$(
 			for type in tls https; do
 				for it in $(uci_get_by_type $NAME server_${type}); do
-					echo "server-${type} ${it} -tls-host-verify" | sed 's+@+ -host-name +g'
+					echo -n "server-${type} "
+					if echo ${it} | grep -q '@'; then
+						echo "${it} -tls-host-verify" | sed 's+@+ -host-name +g'
+					else
+						echo -n ${it}
+						dname=$(echo ${it} | sed 's+.*//++g; s+/.*++g' | sed 's+@.*++g; s+:.*++g')
+						if ! echo ${dname} | grep -q '[0-9]$'; then
+							echo -n " -host-name ${dname}"
+						fi
+						echo " -tls-host-verify"
+					fi
 				done
 			done
 		)
@@ -256,7 +266,7 @@ healthcheck() {
 	}
 
 	# log.gz cleanup
-	rm -f $(ls ${LOG_DIR}/*.gz | grep -v $(date +"%Y%m%d"))
+	rm -f $(ls ${LOG_DIR}/*.gz 2>/dev/null | grep -v $(date +"%Y%m%d"))
 
 	echo "[${LOGTIME}] ${NAME} No Problem."
 }
