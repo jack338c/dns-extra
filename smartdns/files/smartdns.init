@@ -41,6 +41,8 @@ start_service() {
 	mkdir -p /var/etc/ $(dirname ${LOG_DIR})
 
 	port=$(uci_get_by_type $NAME port 7700)
+
+	# -------------------- user --------------------
 	if [ 1024 -lt $port ]; then
 		if grep -q 'dnsmasq' /etc/shadow; then
 			user='dnsmasq'
@@ -49,21 +51,26 @@ start_service() {
 		fi
 	fi
 	[ "V$user" = "V" ] && user='root'
+	# -------------------- user --------------------
 
-	cat <<-EOF >"/var/etc/${NAME}.conf"
-		bind 0.0.0.0:${port}
-		bind-tcp 0.0.0.0:${port}
-		user $user
+	echo "user $user" >"/var/etc/${NAME}.conf"
+	uci_bool_by_type $NAME cache && cat <<-EOF >>"/var/etc/${NAME}.conf"
 		cache-size 1024
 		cache-persist no
 		serve-expired yes
+		prefetch-domain yes
+	EOF
+
+	cat <<-EOF >>"/var/etc/${NAME}.conf"
+		bind 0.0.0.0:${port}
+		bind-tcp 0.0.0.0:${port}
 
 		max-reply-ip-num 2
 		rr-ttl-reply-max 600
 		speed-check-mode tcp:443,tcp:80,ping
+		response-mode fastest-ip
 		domain-rules /github.com/ -c tcp:22
 
-		prefetch-domain $(uci_bool_by_type $NAME prefetch && echo yes || echo no)
 		dualstack-ip-selection $(uci_bool_by_type $NAME ipv6 && echo yes || echo no)
 		force-AAAA-SOA $(uci_bool_by_type $NAME ipv6 && echo no || echo yes)
 		force-qtype-SOA 65
@@ -114,22 +121,26 @@ start_service() {
 
 	EOF
 
-	start_instance /usr/bin/$NAME -c "/var/etc/${NAME}.conf" -f
+	start_instance /usr/bin/$NAME -p- -c "/var/etc/${NAME}.conf" -f
 
+	# -------------------- enable_cn --------------------
 	uci_bool_by_type $NAME enable_cn && {
-		cat <<-EOF >"/var/etc/${NAME}_cn.conf"
-			bind 0.0.0.0:$((port + 1))
-			bind-tcp 0.0.0.0:$((port + 1))
-			user $user
+		echo "user $user" >"/var/etc/${NAME}_cn.conf"
+		uci_bool_by_type $NAME cache && cat <<-EOF >>"/var/etc/${NAME}_cn.conf"
 			cache-size 2048
 			cache-persist no
 			serve-expired yes
+			prefetch-domain yes
+		EOF
+
+		cat <<-EOF >>"/var/etc/${NAME}_cn.conf"
+			bind 0.0.0.0:$((port + 1))
+			bind-tcp 0.0.0.0:$((port + 1))
 
 			max-reply-ip-num 4
 			rr-ttl-reply-max 120
 			speed-check-mode ping,tcp:80,tcp:443
 
-			prefetch-domain $(uci_bool_by_type $NAME prefetch && echo yes || echo no)
 			dualstack-ip-selection $(uci_bool_by_type $NAME ipv6 && echo yes || echo no)
 			force-AAAA-SOA $(uci_bool_by_type $NAME ipv6 && echo no || echo yes)
 			force-qtype-SOA 65
@@ -197,8 +208,9 @@ start_service() {
 			EOF
 		}
 
-		start_instance /usr/bin/$NAME -c "/var/etc/${NAME}_cn.conf" -f
+		start_instance /usr/bin/$NAME -p- -c "/var/etc/${NAME}_cn.conf" -f
 	}
+	# -------------------- enable_cn --------------------
 }
 
 stop_service() {
