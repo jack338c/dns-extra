@@ -65,6 +65,7 @@ start_service() {
 		bind 0.0.0.0:${port}
 		bind-tcp 0.0.0.0:${port}
 
+		rr-ttl-min 120
 		max-reply-ip-num 2
 		rr-ttl-reply-max 600
 		speed-check-mode tcp:443,tcp:80,ping
@@ -137,6 +138,7 @@ start_service() {
 			bind 0.0.0.0:$((port + 1))
 			bind-tcp 0.0.0.0:$((port + 1))
 
+			rr-ttl-min 300
 			max-reply-ip-num 4
 			rr-ttl-reply-max 120
 			speed-check-mode ping,tcp:80,tcp:443
