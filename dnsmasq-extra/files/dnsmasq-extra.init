@@ -291,6 +291,7 @@ update() {
 }
 
 update_others() {
+	baseurl="$1"
 	overlay_free=$(df -k | grep -E '^overlay' | awk '{print $4}')
 	# only update data: adblock/tldn when disk free > 1MiB
 	[ "Z$overlay_free" = "Z" ] && return 0
