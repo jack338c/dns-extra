@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2018-2022 honwen <https://github.com/honwen>
+# Copyright (C) 2018-2023 honwen <https://github.com/honwen>
 #
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dnsmasq-extra
-PKG_VERSION:=2022-12-29
+PKG_VERSION:=2023-02-01
 PKG_RELEASE:=1.9.10
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
@@ -82,7 +82,7 @@ define Package/dnsmasq-extra/install
 	$(INSTALL_BIN) ./files/uci-defaults $(1)/etc/uci-defaults/dnsmasq-extra
 	$(INSTALL_DIR) $(1)/etc/dnsmasq-extra.d
 #	$(INSTALL_DATA) ./files/data/*.gz $(1)/etc/dnsmasq-extra.d/
-	$(INSTALL_DATA) ./files/data/{gfwlist,ShadowrocketEx.conf,tldn,direct,adblock,custom.conf,bogus.conf,chnroute.txt} $(1)/etc/dnsmasq-extra.d/
+	$(INSTALL_DATA) ./files/data/{gfwlist,tldn,direct,adblock,custom.conf,bogus.conf,chnroute.txt} $(1)/etc/dnsmasq-extra.d/
 #	$(INSTALL_DATA) ./files/data/{chnroute.txt,custom.conf,bogus.conf} $(1)/etc/dnsmasq-extra.d/
 ifeq ($(CONFIG_DNSMASQ_EXTRA_FORCE_AIODNS),y)
 	sed 's+\(overwrite_resolve.*\)[0-9]+\1enabled+g' -i $(1)/etc/config/dnsmasq-extra
